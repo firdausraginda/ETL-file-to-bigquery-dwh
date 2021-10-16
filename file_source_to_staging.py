@@ -10,12 +10,12 @@ def read_csv_file(path_to_csv):
     """read csv file and do minor data type conversion, return it as dataframe"""
 
     split_path = str(path_to_csv).split("-")
-    join_path = split_path[-2].lower() + "-" + split_path[-1].lower()
-    join_path = join_path.replace("-", "_").replace(".csv", "")
+    file_name_only = split_path[-2].lower() + "-" + split_path[-1].lower()
+    file_name_only = file_name_only.replace("-", "_").replace(".csv", "")
 
     df = pd.read_csv(path_to_csv, na_values="T", dtype={"precipitation": float}, parse_dates=["date"])
     
-    return df, join_path
+    return df, file_name_only
 
 
 def read_json_file(path_to_json):
