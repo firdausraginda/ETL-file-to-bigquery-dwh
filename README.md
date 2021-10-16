@@ -17,9 +17,9 @@ pipenv install google-auth-oauthlib
 pipenv install google-cloud-bigquery
 ```
 
-- install [pandas gbq](https://cloud.google.com/bigquery/docs/pandas-gbq-migration)
+- install [pandas gbq](https://pandas-gbq.readthedocs.io/en/latest/install.html)
 ```
-pipenv install pandas-gbq 'google-cloud-bigquery[bqstorage,pandas]'
+pipenv install pandas-gbq
 ```
 
 ## References
