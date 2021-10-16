@@ -6,9 +6,12 @@ name = "pypi"
 [packages]
 pandas = "*"
 google-auth-oauthlib = "*"
-google-cloud-bigquery = "*"
+pandas-gbq = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.8"
+
+[packages.google-cloud-bigquery]
+extras = [ "pandas", "bqstorage",]
