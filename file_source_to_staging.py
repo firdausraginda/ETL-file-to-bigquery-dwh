@@ -9,6 +9,7 @@ import os
 def read_csv_file(path_to_csv):
     """read csv file and do minor data type conversion, return it as dataframe"""
 
+    # get file name
     split_path = str(path_to_csv).split("-")
     file_name = split_path[-2].lower() + "-" + split_path[-1].lower()
     file_name = file_name.replace("-", "_").replace(".csv", "")
@@ -21,9 +22,14 @@ def read_csv_file(path_to_csv):
 def read_json_file(path_to_json):
     """read json file and return it as dataframe"""
 
+    # get file name
+    split_path = str(path_to_json).split("_")
+    file_name = "yelp_" + split_path[-1].lower()
+    file_name = file_name.replace(".json", "")
+
     df = pd.read_json(path_to_json, lines=True)
 
-    return df
+    return df, file_name
 
 
 def write_to_staging(df, table_name):
@@ -53,5 +59,10 @@ if __name__ == "__main__":
     
     for csv in list_csv:
         complete_path = path_to_csv.joinpath(csv)
-        csv_df, csv_table_name = read_csv_file(complete_path)
-        write_to_staging(csv_df, csv_table_name)
+        csv_df, csv_file_name = read_csv_file(complete_path)
+        write_to_staging(csv_df, csv_file_name)
+
+    for json in list_json:
+        complete_path = path_to_json.joinpath(json)
+        json_df, json_file_name = read_json_file(complete_path)
+        write_to_staging(json_df, json_file_name)
