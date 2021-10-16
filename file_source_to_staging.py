@@ -14,9 +14,10 @@ def read_csv_file(path_to_csv):
     file_name = split_path[-2].lower() + "-" + split_path[-1].lower()
     file_name = file_name.replace("-", "_").replace(".csv", "")
 
-    df = pd.read_csv(path_to_csv, na_values="T", dtype={"precipitation": float}, parse_dates=["date"])
+    dfs = pd.read_csv(path_to_csv, na_values="T", dtype={"precipitation": float}, parse_dates=["date"], chunksize=10000)
     
-    return df, file_name
+    for df in dfs:
+        yield df, file_name
 
 
 def read_json_file(path_to_json):
@@ -27,20 +28,22 @@ def read_json_file(path_to_json):
     file_name = "yelp_" + split_path[-1].lower()
     file_name = file_name.replace(".json", "")
 
-    df = pd.read_json(path_to_json, lines=True)
+    dfs = pd.read_json(path_to_json, lines=True, chunksize=10000)
+    
+    for df in dfs:
+        yield df, file_name
 
-    return df, file_name
 
-
-def write_to_staging(df, table_name):
+def write_to_staging(dfs):
     """write data from csv/json file to staging dataset with respective table name"""
 
     client = create_bq_client()
     dataset_name = "project_1_staging"
 
-    pandas_gbq.to_gbq(
-        df, f"{dataset_name}.{table_name}", project_id=client.project, if_exists="replace"
-    )
+    for df in dfs:
+        pandas_gbq.to_gbq(
+            df[0], f"{dataset_name}.{df[1]}", project_id=client.project, if_exists="append"
+        )
 
     return None
 
@@ -57,12 +60,16 @@ if __name__ == "__main__":
     path_to_json = current_path.parent.joinpath("src/yelp_reviews")
     list_json = os.listdir(path_to_json)
     
+    # read all csv files and write it to staging
     for csv in list_csv:
         complete_path = path_to_csv.joinpath(csv)
-        csv_df, csv_file_name = read_csv_file(complete_path)
-        write_to_staging(csv_df, csv_file_name)
+        csv_df = read_csv_file(complete_path)
+        write_to_staging(csv_df)
 
-    for json in list_json:
-        complete_path = path_to_json.joinpath(json)
-        json_df, json_file_name = read_json_file(complete_path)
-        write_to_staging(json_df, json_file_name)
+    # read all json files and write it to staging
+    # for json in list_json:
+    #     complete_path = path_to_json.joinpath(json)
+    #     json_df = read_json_file(complete_path)
+    #     write_to_staging(json_df)
+    
+    #     break
