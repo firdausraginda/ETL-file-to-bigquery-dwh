@@ -6,6 +6,30 @@ from pathlib import Path
 import os
 
 
+def convert_json_to_csv(path_to_json):
+    """read json file and write as csv in chunks"""
+
+    # get file name
+    split_path = str(path_to_json).split("_")
+    file_name = "yelp_" + split_path[-1].lower()
+    file_name = file_name.replace(".json", "")
+
+    # set folder
+    path_to_folder = f"./src/{file_name}_chunks"
+
+    # create chunks folder if not exists
+    if not os.path.exists(path_to_folder):
+        os.makedirs(path_to_folder)
+
+    # read json and write to csv per chunksize
+    batch_no = 1
+    for chunk in pd.read_json(path_to_json, lines=True, chunksize=100000):
+        chunk.to_csv(f"{path_to_folder}/{file_name}_{batch_no}.csv", index=None)
+        batch_no += 1
+
+    return None
+
+
 def read_csv_file(path_to_csv):
     """read csv file and do minor data type conversion, return it as dataframe"""
 
@@ -14,21 +38,7 @@ def read_csv_file(path_to_csv):
     file_name = split_path[-2].lower() + "-" + split_path[-1].lower()
     file_name = file_name.replace("-", "_").replace(".csv", "")
 
-    dfs = pd.read_csv(path_to_csv, na_values="T", dtype={"precipitation": float}, parse_dates=["date"], chunksize=10000)
-    
-    for df in dfs:
-        yield df, file_name
-
-
-def read_json_file(path_to_json):
-    """read json file and return it as dataframe"""
-
-    # get file name
-    split_path = str(path_to_json).split("_")
-    file_name = "yelp_" + split_path[-1].lower()
-    file_name = file_name.replace(".json", "")
-
-    dfs = pd.read_json(path_to_json, lines=True, chunksize=10000)
+    dfs = pd.read_csv(path_to_csv, na_values="T", dtype={"precipitation": float}, parse_dates=["date"], chunksize=20000)
     
     for df in dfs:
         yield df, file_name
@@ -52,24 +62,19 @@ if __name__ == "__main__":
 
     current_path = Path(__file__).absolute()
 
-    # get path to csv files
-    path_to_csv = current_path.parent.joinpath("src/weather")
-    list_csv = os.listdir(path_to_csv)
-
-    # get path to json files
-    path_to_json = current_path.parent.joinpath("src/yelp_reviews")
-    list_json = os.listdir(path_to_json)
+    # get source files
+    path_to_files = current_path.parent.joinpath("src/")
+    list_files = os.listdir(path_to_files)
     
-    # read all csv files and write it to staging
-    for csv in list_csv:
-        complete_path = path_to_csv.joinpath(csv)
-        csv_df = read_csv_file(complete_path)
-        write_to_staging(csv_df)
-
-    # read all json files and write it to staging
-    # for json in list_json:
-    #     complete_path = path_to_json.joinpath(json)
-    #     json_df = read_json_file(complete_path)
-    #     write_to_staging(json_df)
+    # read all json files and convert it to csv
+    for file in list_files:
+        if file.endswith(".json"):
+            complete_path = path_to_files.joinpath(file)
+            convert_json_to_csv(complete_path)
     
-    #     break
+    # read all csv files and write to staging
+    # for file in list_files:
+    #     if file.endswith(".csv"):
+    #         complete_path = path_to_files.joinpath(file)
+    #         csv_df = read_csv_file(complete_path)
+    #         write_to_staging(csv_df)
