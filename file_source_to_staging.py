@@ -9,9 +9,13 @@ import os
 def read_csv_file(path_to_csv):
     """read csv file and do minor data type conversion, return it as dataframe"""
 
+    split_path = str(path_to_csv).split("-")
+    join_path = split_path[-2].lower() + "-" + split_path[-1].lower()
+    join_path = join_path.replace("-", "_").replace(".csv", "")
+
     df = pd.read_csv(path_to_csv, na_values="T", dtype={"precipitation": float}, parse_dates=["date"])
     
-    return df
+    return df, join_path
 
 
 def read_json_file(path_to_json):
@@ -22,12 +26,11 @@ def read_json_file(path_to_json):
     return df
 
 
-def write_to_staging(df):
+def write_to_staging(df, table_name):
     """write data from csv/json file to staging dataset with respective table name"""
 
     client = create_bq_client()
     dataset_name = "project_1_staging"
-    table_name = "precipitation"
 
     pandas_gbq.to_gbq(
         df, f"{dataset_name}.{table_name}", project_id=client.project, if_exists="replace"
@@ -49,11 +52,6 @@ if __name__ == "__main__":
     list_json = os.listdir(path_to_json)
     
     for csv in list_csv:
-        print(path_to_csv.joinpath(csv))
-
-
-    # print(precipitation_df.head())
-    # print(temperature_df.head())
-    # print(temperature_df.info())
-    # print(business_df.head())
-    # print(business_df.info())
+        complete_path = path_to_csv.joinpath(csv)
+        csv_df, csv_table_name = read_csv_file(complete_path)
+        write_to_staging(csv_df, csv_table_name)
