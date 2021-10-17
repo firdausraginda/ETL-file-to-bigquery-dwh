@@ -1,5 +1,5 @@
 SELECT
-    concat(user_id, '-', business_id) as id,
+    concat(user_id, '-', business_id) as tip_id,
     user_id,
     business_id,
     text,
