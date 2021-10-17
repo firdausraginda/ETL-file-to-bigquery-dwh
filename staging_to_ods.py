@@ -32,6 +32,10 @@ def transform_precipitation():
     df['precipitation'] = pd.to_numeric(df['precipitation'], errors='coerce')
     df['precipitation_normal'] = pd.to_numeric(df['precipitation_normal'], errors='coerce')
 
+    sql = """
+
+        """
+
     return df
 
 
@@ -109,24 +113,24 @@ def transform_yelp_business():
             is_open,
             categories,
 
-            SAFE_CAST(eo.attributes_outdoor_seating AS bool) as attributes_outdoor_seating,
-            SAFE_CAST(eo.attributes_good_for_kids AS bool) as attributes_good_for_kids,
-            SAFE_CAST(eo.attributes_restaurants_good_for_groups AS bool) as attributes_restaurants_good_for_groups,
-            SAFE_CAST(eo.attributes_has_tv AS bool) as attributes_has_tv,
-            SAFE_CAST(eo.attributes_restaurants_take_out AS bool) as attributes_restaurants_take_out,
-            SAFE_CAST(eo.attributes_business_accepts_credit_cards AS bool) as attributes_business_accepts_credit_cards,
-            SAFE_CAST(eo.attributes_restaurants_price_range2 AS int) as attributes_restaurants_price_range2,
-            SAFE_CAST(eo.attributes_bike_parking AS bool) as attributes_bike_parking,
-            SAFE_CAST(eo.attributes_restaurants_reservations AS bool) as attributes_restaurants_reservations,
-            SAFE_CAST(eo.attributes_business_accepts_bitcoin AS bool) as attributes_business_accepts_bitcoin,
+            SAFE_CAST(eo.attributes_outdoor_seating AS bool) AS attributes_outdoor_seating,
+            SAFE_CAST(eo.attributes_good_for_kids AS bool) AS attributes_good_for_kids,
+            SAFE_CAST(eo.attributes_restaurants_good_for_groups AS bool) AS attributes_restaurants_good_for_groups,
+            SAFE_CAST(eo.attributes_has_tv AS bool) AS attributes_has_tv,
+            SAFE_CAST(eo.attributes_restaurants_take_out AS bool) AS attributes_restaurants_take_out,
+            SAFE_CAST(eo.attributes_business_accepts_credit_cards AS bool) AS attributes_business_accepts_credit_cards,
+            SAFE_CAST(eo.attributes_restaurants_price_range2 AS int) AS attributes_restaurants_price_range2,
+            SAFE_CAST(eo.attributes_bike_parking AS bool) AS attributes_bike_parking,
+            SAFE_CAST(eo.attributes_restaurants_reservations AS bool) AS attributes_restaurants_reservations,
+            SAFE_CAST(eo.attributes_business_accepts_bitcoin AS bool) AS attributes_business_accepts_bitcoin,
             eo.attributes_restaurants_attire,
             eo.attributes_business_parking,
-            SAFE_CAST(eo.attributes_caters AS bool) as attributes_caters,
+            SAFE_CAST(eo.attributes_caters AS bool) AS attributes_caters,
             eo.attributes_noise_level,
             eo.attributes_wifi,
             eo.attributes_ambience,
             eo.attributes_good_for_meal,
-            SAFE_CAST(eo.attributes_restaurants_delivery AS bool) as attributes_restaurants_delivery,
+            SAFE_CAST(eo.attributes_restaurants_delivery AS bool) AS attributes_restaurants_delivery,
             eo.attributes_alcohol,
 
             eo.hours_monday,
