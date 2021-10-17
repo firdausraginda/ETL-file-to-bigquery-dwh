@@ -20,6 +20,9 @@ def convert_json_to_csv(path_to_json):
         chunk_df.to_csv(f"./src/{file_name}_{batch_no}.csv", index=None)
         batch_no += 1
 
+        if batch_no == 3: # debugging purpose
+            break
+
     return None
 
 
@@ -67,7 +70,6 @@ if __name__ == "__main__":
     
     # read all json files and write it as csv
     for file in list_files:
-        # if 'business' in file or 'checkin' in file: # debugging purpose
         if file.endswith(".json"):
             complete_path = path_to_files.joinpath(file)
             convert_json_to_csv(complete_path)
@@ -80,5 +82,5 @@ if __name__ == "__main__":
     for file in list_files:
             if file.endswith(".csv"):
                 complete_path = path_to_files.joinpath(file)
-                csv_df = read_csv_file(complete_path)
-                write_to_staging(csv_df)
+                csv_chunk = read_csv_file(complete_path)
+                write_to_staging(csv_chunk)
