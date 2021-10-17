@@ -10,7 +10,7 @@ def transform_precipitation():
             SAFE_CAST(precipitation AS FLOAT64) AS precipitation,
             SAFE_CAST(precipitation_normal AS FLOAT64) AS precipitation_normal,
         FROM
-        `dummy-329203.project_1_staging.precipitation_inch`
+            `dummy-329203.project_1_staging.precipitation_inch`
         """
 
     client = create_bq_client()
