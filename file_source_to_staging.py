@@ -20,7 +20,7 @@ def convert_json_to_csv(path_to_json):
         chunk_df.to_csv(f"./src/{file_name}_{batch_no}.csv", index=None)
         batch_no += 1
 
-        if batch_no == 3: # debugging purpose
+        if batch_no == 3: # testing purpose
             break
 
     return None
