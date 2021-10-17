@@ -5,6 +5,8 @@ from google.oauth2 import service_account
 
 
 def create_bq_client():
+    """auth bigquery credential & create client"""
+
     current_path = Path(__file__).absolute()
     credentials = service_account.Credentials.from_service_account_file(
         current_path.parent.parent.joinpath("service_account.json"), scopes=["https://www.googleapis.com/auth/cloud-platform"],
@@ -17,6 +19,7 @@ def create_bq_client():
 
 
 def create_datasets(client):
+    """define dataset names & create datasets"""
 
     # set dataset names
     dataset_names = ['project_1_staging', 'project_1_ods', 'project_1_dwh']
