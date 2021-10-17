@@ -1,0 +1,25 @@
+SELECT
+    user_id,
+    name,
+    SAFE_CAST(review_count AS INT64) AS review_count,
+    PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', yelping_since) AS yelping_since,
+    SAFE_CAST(useful AS INT64) AS useful,
+    SAFE_CAST(funny AS INT64) AS funny,
+    SAFE_CAST(cool AS INT64) AS cool,
+    elite,
+    friends,
+    SAFE_CAST(fans AS INT64) AS fans,
+    SAFE_CAST(average_stars AS FLOAT64) AS average_stars,
+    SAFE_CAST(compliment_hot AS INT64) AS compliment_hot,
+    SAFE_CAST(compliment_more AS INT64) AS compliment_more,
+    SAFE_CAST(compliment_profile AS INT64) AS compliment_profile,
+    SAFE_CAST(compliment_cute AS INT64) AS compliment_cute,
+    SAFE_CAST(compliment_list AS INT64) AS compliment_list,
+    SAFE_CAST(compliment_note AS INT64) AS compliment_note,
+    SAFE_CAST(compliment_plain AS INT64) AS compliment_plain,
+    SAFE_CAST(compliment_cool AS INT64) AS complimentcool,
+    SAFE_CAST(compliment_funny AS INT64) AS compliment_funny,
+    SAFE_CAST(compliment_writer AS INT64) AS compliment_writer,
+    SAFE_CAST(compliment_photos AS INT64) AS compliment_photos
+FROM
+    `dummy-329203.project_1_staging.yelp_user`
