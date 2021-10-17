@@ -41,7 +41,7 @@ def read_csv_file(path_to_csv):
     # get file name for yelp csv files
     else:
         split_path = str(path_to_csv).split("_")
-        file_name = split_path[0].lower() + "_" + split_path[1].lower()
+        file_name = "yelp_" + split_path[-2].lower()
         file_name = file_name.replace(".csv", "")
 
     for chunk in pd.read_csv(path_to_csv, chunksize=100000):
@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
     current_path = Path(__file__).absolute()
 
-    # get source files
+    # # get source files
     path_to_files = current_path.parent.joinpath("src/")
     list_files = os.listdir(path_to_files)
     
