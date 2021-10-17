@@ -15,16 +15,16 @@ def convert_json_to_csv(path_to_json):
     file_name = file_name.replace(".json", "")
 
     # set folder
-    path_to_folder = f"./src/{file_name}_chunks"
+    # path_to_folder = f"./src/{file_name}_chunks"
 
     # create chunks folder if not exists
-    if not os.path.exists(path_to_folder):
-        os.makedirs(path_to_folder)
+    # if not os.path.exists(path_to_folder):
+    #     os.makedirs(path_to_folder)
 
     # read json and write to csv per chunksize
     batch_no = 1
     for chunk in pd.read_json(path_to_json, lines=True, chunksize=100000):
-        chunk.to_csv(f"{path_to_folder}/{file_name}_{batch_no}.csv", index=None)
+        chunk.to_csv(f"./src/{file_name}_{batch_no}.csv", index=None)
         batch_no += 1
 
     return None
@@ -33,26 +33,30 @@ def convert_json_to_csv(path_to_json):
 def read_csv_file(path_to_csv):
     """read csv file and do minor data type conversion, return it as dataframe"""
 
-    # get file name
-    split_path = str(path_to_csv).split("-")
-    file_name = split_path[-2].lower() + "-" + split_path[-1].lower()
-    file_name = file_name.replace("-", "_").replace(".csv", "")
+    # get file name for weather csv files
+    if "yelp" not in str(path_to_csv):
+        split_path = str(path_to_csv).split("-")
+        file_name = split_path[-2].lower() + "_" + split_path[-1].lower()
+        file_name = file_name.replace(".csv", "")    
+    # get file name for yelp csv files
+    else:
+        split_path = str(path_to_csv).split("_")
+        file_name = split_path[0].lower() + "_" + split_path[1].lower()
+        file_name = file_name.replace(".csv", "")
 
-    dfs = pd.read_csv(path_to_csv, na_values="T", dtype={"precipitation": float}, parse_dates=["date"], chunksize=20000)
-    
-    for df in dfs:
-        yield df, file_name
+    for chunk in pd.read_csv(path_to_csv, chunksize=100000):
+        yield chunk, file_name
 
 
-def write_to_staging(dfs):
+def write_to_staging(chunks):
     """write data from csv/json file to staging dataset with respective table name"""
 
     client = create_bq_client()
     dataset_name = "project_1_staging"
 
-    for df in dfs:
+    for chunk in chunks:
         pandas_gbq.to_gbq(
-            df[0], f"{dataset_name}.{df[1]}", project_id=client.project, if_exists="append"
+            chunk[0], f"{dataset_name}.{chunk[1]}", project_id=client.project, if_exists="append"
         )
 
     return None
@@ -66,15 +70,20 @@ if __name__ == "__main__":
     path_to_files = current_path.parent.joinpath("src/")
     list_files = os.listdir(path_to_files)
     
-    # read all json files and convert it to csv
+    # read all json files and write it as csv
     for file in list_files:
-        if file.endswith(".json"):
-            complete_path = path_to_files.joinpath(file)
-            convert_json_to_csv(complete_path)
+        if 'business' in file or 'checkin' in file: # debugging purpose
+            if file.endswith(".json"):
+                complete_path = path_to_files.joinpath(file)
+                convert_json_to_csv(complete_path)
+
+    # get source files after adding new csv files
+    path_to_files = current_path.parent.joinpath("src/")
+    list_files = os.listdir(path_to_files)
     
     # read all csv files and write to staging
-    # for file in list_files:
-    #     if file.endswith(".csv"):
-    #         complete_path = path_to_files.joinpath(file)
-    #         csv_df = read_csv_file(complete_path)
-    #         write_to_staging(csv_df)
+    for file in list_files:
+            if file.endswith(".csv"):
+                complete_path = path_to_files.joinpath(file)
+                csv_df = read_csv_file(complete_path)
+                write_to_staging(csv_df)
