@@ -17,24 +17,19 @@ def sql_read_query(table_name):
 
 def transform_precipitation():
 
-    # get sql query to read table
+    sql = """
+        SELECT
+            PARSE_DATE('%Y%m%d', CAST(date AS STRING)) AS date,
+            SAFE_CAST(precipitation AS FLOAT64) AS precipitation,
+            SAFE_CAST(precipitation_normal AS FLOAT64) AS precipitation_normal,
+        FROM
+        `dummy-329203.project_1_staging.precipitation_inch`
+        """
+
     client = create_bq_client()
-    table_name = 'precipitation_inch'
-    sql = sql_read_query(table_name)
 
     # read table as dataframe
-    df = pandas_gbq.read_gbq(sql, project_id=client.project)
-
-    # convert date from int to datetime
-    df['date'] = pd.to_datetime(df['date'], format='%Y%m%d')
-
-    # convert precipitation & precipitation_normal to float with error handling to NaN
-    df['precipitation'] = pd.to_numeric(df['precipitation'], errors='coerce')
-    df['precipitation_normal'] = pd.to_numeric(df['precipitation_normal'], errors='coerce')
-
-    sql = """
-
-        """
+    df = pandas_gbq.read_gbq(sql, project_id=client.project)    
 
     return df
 
@@ -154,9 +149,9 @@ def transform_yelp_business():
 
 if __name__ == "__main__":
     
-    # precipitation_df = transform_precipitation()
-    # temperature_df = transform_temperature()
-    yelp_business_df = transform_yelp_business()
+    precipitation_df = transform_precipitation()
+    # # temperature_df = transform_temperature()
+    # yelp_business_df = transform_yelp_business()
 
-    print(yelp_business_df)
-    print(yelp_business_df.info())
+    print(precipitation_df)
+    print(precipitation_df.info())
