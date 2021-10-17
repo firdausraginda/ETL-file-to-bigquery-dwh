@@ -16,7 +16,7 @@ def transform_precipitation():
     client = create_bq_client()
 
     # read table as dataframe
-    df = pandas_gbq.read_gbq(sql, project_id=client.project)    
+    df = pandas_gbq.read_gbq(sql, project_id=client.project)
 
     return df
 
@@ -186,6 +186,8 @@ def transform_yelp_checkin():
     # read table as dataframe
     df = pandas_gbq.read_gbq(sql, project_id=client.project)
 
+    return df
+
 
 def transform_yelp_tip():
     sql = """
@@ -208,6 +210,31 @@ def transform_yelp_tip():
     return df
 
 
+def transform_yelp_review():
+
+    sql = """
+        SELECT
+            review_id,
+            user_id,
+            business_id,
+            SAFE_CAST(stars AS INT64) AS stars,
+            SAFE_CAST(useful AS INT64) AS useful,
+            SAFE_CAST(funny AS INT64) AS funny,
+            SAFE_CAST(cool AS INT64) AS cool,
+            text,
+            PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', date) AS date
+        FROM
+        `dummy-329203.project_1_staging.yelp_review`
+        """
+
+    client = create_bq_client()
+
+    # read table as dataframe
+    df = pandas_gbq.read_gbq(sql, project_id=client.project)
+
+    return df
+
+
 if __name__ == "__main__":
     
     precipitation_df = transform_precipitation()
@@ -216,6 +243,7 @@ if __name__ == "__main__":
     yelp_user_df = transform_yelp_user()
     yelp_checkin = transform_yelp_checkin()
     yelp_tip = transform_yelp_tip()
+    yelp_review = transform_yelp_review()
 
-    print(yelp_tip)
-    print(yelp_tip.info())
+    print(yelp_review)
+    print(yelp_review.info())
