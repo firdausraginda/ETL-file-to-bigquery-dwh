@@ -125,6 +125,7 @@ def transform_yelp_business():
         FROM `dummy-329203.project_1_staging.yelp_business` yb
         LEFT JOIN extract_obj eo USING(business_id)
         """
+    
     client = create_bq_client()
 
     # read table as dataframe
@@ -162,7 +163,43 @@ def transform_yelp_user():
         FROM
             `dummy-329203.project_1_staging.yelp_user`
         """
+    
+    client = create_bq_client()
 
+    # read table as dataframe
+    df = pandas_gbq.read_gbq(sql, project_id=client.project)
+
+    return df
+
+
+def transform_yelp_checkin():
+    sql = """
+        SELECT
+            business_id,
+            date
+        FROM
+            `dummy-329203.project_1_staging.yelp_checkin`
+        """
+    
+    client = create_bq_client()
+
+    # read table as dataframe
+    df = pandas_gbq.read_gbq(sql, project_id=client.project)
+
+
+def transform_yelp_tip():
+    sql = """
+        SELECT
+            concat(user_id, '-', business_id) as id,
+            user_id,
+            business_id,
+            text,
+            PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', date) AS date,
+            SAFE_CAST(compliment_count AS INT64) AS compliment_count
+        FROM
+            `dummy-329203.project_1_staging.yelp_tip`
+        """
+    
     client = create_bq_client()
 
     # read table as dataframe
@@ -177,6 +214,8 @@ if __name__ == "__main__":
     temperature_df = transform_temperature()
     yelp_business_df = transform_yelp_business()
     yelp_user_df = transform_yelp_user()
+    yelp_checkin = transform_yelp_checkin()
+    yelp_tip = transform_yelp_tip()
 
-    print(yelp_user_df)
-    print(yelp_user_df.info())
+    print(yelp_tip)
+    print(yelp_tip.info())
