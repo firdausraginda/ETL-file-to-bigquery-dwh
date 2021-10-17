@@ -2,19 +2,6 @@ import pandas as pd
 from bigquery.setup import create_bq_client
 import pandas_gbq
 
-
-def sql_read_query(table_name):
-    """define sql query to read table with given table name"""
-
-    sql = """
-        SELECT *
-        FROM `dummy-329203.project_1_staging.{}`
-        limit 1000
-        """.format(table_name)
-
-    return sql
-
-
 def transform_precipitation():
 
     sql = """
@@ -146,11 +133,50 @@ def transform_yelp_business():
     return df
 
 
+def transform_yelp_user():
+    sql = """
+        SELECT
+            user_id,
+            name,
+            SAFE_CAST(review_count AS INT64) AS review_count,
+            PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', yelping_since) AS yelping_since,
+            SAFE_CAST(useful AS INT64) AS useful,
+            SAFE_CAST(funny AS INT64) AS funny,
+            SAFE_CAST(cool AS INT64) AS cool,
+            elite,
+            friends,
+            SAFE_CAST(fans AS INT64) AS fans,
+            SAFE_CAST(average_stars AS FLOAT64) AS average_stars,
+            SAFE_CAST(compliment_hot AS INT64) AS compliment_hot,
+            SAFE_CAST(compliment_more AS INT64) AS compliment_more,
+            SAFE_CAST(compliment_profile AS INT64) AS compliment_profile,
+            SAFE_CAST(compliment_cute AS INT64) AS compliment_cute,
+            SAFE_CAST(compliment_list AS INT64) AS compliment_list,
+            SAFE_CAST(compliment_note AS INT64) AS compliment_note,
+            SAFE_CAST(compliment_plain AS INT64) AS compliment_plain,
+            SAFE_CAST(compliment_cool AS INT64) AS complimentcool,
+            SAFE_CAST(compliment_funny AS INT64) AS compliment_funny,
+            SAFE_CAST(compliment_writer AS INT64) AS compliment_writer,
+            SAFE_CAST(compliment_photos AS INT64) AS compliment_photos
+
+        FROM
+            `dummy-329203.project_1_staging.yelp_user`
+        """
+
+    client = create_bq_client()
+
+    # read table as dataframe
+    df = pandas_gbq.read_gbq(sql, project_id=client.project)
+
+    return df
+
+
 if __name__ == "__main__":
     
     precipitation_df = transform_precipitation()
     temperature_df = transform_temperature()
     yelp_business_df = transform_yelp_business()
+    yelp_user_df = transform_yelp_user()
 
-    print(temperature_df)
-    print(temperature_df.info())
+    print(yelp_user_df)
+    print(yelp_user_df.info())
