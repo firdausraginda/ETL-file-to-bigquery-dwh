@@ -67,10 +67,10 @@ if __name__ == "__main__":
     
     # read all json files and write it as csv
     for file in list_files:
-        if 'business' in file or 'checkin' in file: # debugging purpose
-            if file.endswith(".json"):
-                complete_path = path_to_files.joinpath(file)
-                convert_json_to_csv(complete_path)
+        # if 'business' in file or 'checkin' in file: # debugging purpose
+        if file.endswith(".json"):
+            complete_path = path_to_files.joinpath(file)
+            convert_json_to_csv(complete_path)
 
     # get source files after adding new csv files
     path_to_files = current_path.parent.joinpath("src/")
