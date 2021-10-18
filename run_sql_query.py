@@ -4,7 +4,7 @@ from bigquery.setup import create_bq_client
 from google.cloud import bigquery
 
 
-def execute_sql(path_to_sql_folder, dataset_destination_name):
+def execute_sql(path_to_sql_folder, dataset_destination_name, insert_method):
     current_path = Path(__file__).absolute()
     path_to_files = current_path.parent.joinpath(f"{path_to_sql_folder}/")
     list_files = os.listdir(path_to_files)
@@ -22,11 +22,19 @@ def execute_sql(path_to_sql_folder, dataset_destination_name):
         # get bigquery client
         client = create_bq_client()
 
+        # set the write dispotition
+        # write disposition is action took if dest table alr exists
+        if insert_method == 'new':
+            write_dispotition = bigquery.WriteDisposition.WRITE_EMPTY
+        elif insert_method == 'replace':
+            write_dispotition = bigquery.WriteDisposition.WRITE_TRUNCATE
+        else:
+            write_dispotition = bigquery.WriteDisposition.WRITE_APPEND
+
         # set job config: destination table & write disposition 
-        # write disposition is action took if dest table alr exists: fail (WRITE_EMPTY), replace (WRITE_TRUNCATE), or append (WRITE_APPEND)
         job_config = bigquery.QueryJobConfig(
             destination=f"{client.project}.{dataset_name}.{table_name}", 
-            write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
+            write_disposition=write_dispotition
             )
 
         # make API request to run the job config
@@ -37,7 +45,7 @@ def execute_sql(path_to_sql_folder, dataset_destination_name):
 if __name__ == "__main__":
 
     # execute sql transforms from staging to ods
-    execute_sql("sql_transforms_to_ods", "project_1_ods")
+    execute_sql("sql_transforms_to_ods", "project_1_ods", "replace")
 
     # execute sql transforms from ods to dwh
-    execute_sql("sql_transforms_to_dwh", "project_1_dwh")
+    execute_sql("sql_transforms_to_dwh", "project_1_dwh", "append")
