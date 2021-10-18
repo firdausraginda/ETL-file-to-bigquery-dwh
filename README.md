@@ -33,6 +33,11 @@ pipenv install pandas-gbq
 
 ## Usage
 
+First, need to create empty dataset for **staging**, **ODS**, & **DWH**:
+```
+pipenv run python bigquery/setup.py
+```
+
 To convert all **json** files to **csv** files, and write it to **staging dataset**, can run the `file_source_to_staging.py` file:
 ```
 pipenv run python file_source_to_staging.py
