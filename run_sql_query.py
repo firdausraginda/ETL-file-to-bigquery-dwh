@@ -28,7 +28,7 @@ def execute_sql(path_to_sql_folder, dataset_destination_name, insert_method):
             write_dispotition = bigquery.WriteDisposition.WRITE_EMPTY
         elif insert_method == 'replace':
             write_dispotition = bigquery.WriteDisposition.WRITE_TRUNCATE
-        else:
+        elif insert_method == 'append':
             write_dispotition = bigquery.WriteDisposition.WRITE_APPEND
 
         # set job config: destination table & write disposition 
