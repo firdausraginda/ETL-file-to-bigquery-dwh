@@ -5,7 +5,7 @@ from google.cloud import bigquery
 
 
 current_path = Path(__file__).absolute()
-path_to_files = current_path.parent.joinpath("sql_transforms/")
+path_to_files = current_path.parent.joinpath("sql_transforms_to_ods/")
 list_files = os.listdir(path_to_files)
 
 for file in list_files:
